@@ -1,0 +1,10 @@
+bin
+tests/data
+tests/gen-data
+*.o
+*.d
+*.d.*
+test/
+playground.c
+docs/
+TODO.md

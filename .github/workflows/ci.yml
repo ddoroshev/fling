@@ -1,0 +1,27 @@
+name: CI
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  build-and-test:
+    strategy:
+      matrix:
+        os: [ubuntu-latest, macos-latest]
+        include:
+          - os: ubuntu-latest
+            name: Linux
+          - os: macos-latest  
+            name: macOS
+    
+    runs-on: ${{ matrix.os }}
+    name: ${{ matrix.name }}
+    
+    steps:
+    - uses: actions/checkout@v4
+      with:
+        fetch-depth: 0  # Need full history for git describe
+    
+    - name: Run tests
+      run: make && make test-data-basic testrun

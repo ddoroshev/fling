@@ -1,0 +1,7 @@
+#pragma once
+
+#define STRINGIFY(x) #x
+#define TOSTRING(x) STRINGIFY(x)
+
+#define DEFAULT_PORT 54321
+#define DEFAULT_PORT_STR TOSTRING(DEFAULT_PORT)
