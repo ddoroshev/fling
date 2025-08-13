@@ -32,7 +32,7 @@ int file_open(file *f, char *fname)
         return -1;
     }
     strncpy(f->hdr.fname, basename(fname), sizeof(f->hdr.fname) - 1);
-    f->hdr.fsize = file_stat.st_size;
+    f->hdr.fsize = (size_t)file_stat.st_size;
     f->fd = fd;
     return 0;
 }
@@ -48,9 +48,9 @@ int file_open(file *f, char *fname)
  * @param sock Socket descriptor to send data to
  * @return     Total bytes sent on success, -1 on error
  */
-static uint64_t file_send_contents(file *f, int sock)
+static ssize_t file_send_contents(file *f, int sock)
 {
-    uint64_t offset = 0;
+    size_t offset = 0;
     char buf[CHUNK_SIZE] = {0};
 
     while (offset < f->hdr.fsize) {
@@ -58,16 +58,16 @@ static uint64_t file_send_contents(file *f, int sock)
         if (bytes_sent < 0) {
             return -1;
         }
-        offset += bytes_sent;
+        offset += (size_t)bytes_sent;
         if (progress_bar_callback) {
             progress_bar_callback(offset, f->hdr.fsize);
         }
     }
 
-    return offset;
+    return (ssize_t)offset;
 }
 
-uint64_t file_send(file *f, int sock)
+ssize_t file_send(file *f, int sock)
 {
     if (send(sock, &f->hdr, FHEADER_SIZE, 0) < 0) {
         perror("send header");
@@ -115,9 +115,9 @@ void file_close(file *f)
  * @param sock Socket descriptor to receive data from
  * @return Total bytes received on success, -1 on error
  */
-static uint64_t file_receive_contents(file *f, int sock)
+static ssize_t file_receive_contents(file *f, int sock)
 {
-    uint64_t left = f->hdr.fsize;
+    size_t left = f->hdr.fsize;
     char buf[CHUNK_SIZE] = {0};
 
     while (left > 0) {
@@ -126,26 +126,26 @@ static uint64_t file_receive_contents(file *f, int sock)
         if (bytes_read < 0) {
             return -1;
         }
-        left -= bytes_read;
+        left -= (size_t)bytes_read;
     }
-    return f->hdr.fsize;
+    return (ssize_t)f->hdr.fsize;
 }
 
-uint64_t receive_file(int sock)
+ssize_t receive_file(int sock)
 {
-    int bytes_read, rc, retval;
+    ssize_t bytes_read, rc, retval;
     file f = {0};
 
     bytes_read = recv(sock, &f, FHEADER_SIZE, 0);
-    if (bytes_read <= 0 || bytes_read < FHEADER_SIZE) {
-        printf("Unexpected amount of bytes: %d\n", bytes_read);
+    if (bytes_read <= 0 || (size_t)bytes_read < FHEADER_SIZE) {
+        printf("Unexpected amount of bytes: %zd\n", bytes_read);
         return -1;
     }
     strncpy(f.hdr.fname, basename(f.hdr.fname), strlen(f.hdr.fname));
-    printf("Accepting file: name %s, size %" PRIu64 "...\n",
+    printf("Accepting file: name %s, size %zd...\n",
            f.hdr.fname, f.hdr.fsize);
 
-    retval = f.hdr.fsize;
+    retval = (ssize_t)f.hdr.fsize;
 
     rc = file_create(&f);
     if (rc < 0) {

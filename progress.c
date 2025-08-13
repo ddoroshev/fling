@@ -10,15 +10,15 @@ progress_bar_func progress_bar_callback = NULL;
 struct timespec start_time = {0};
 struct timespec last_update = {0};
 
-static void human_readable_size(char *buf, size_t size, uint64_t bytes);
-static void calculate_speed(char *buf, size_t size, uint64_t bytes, double elapsed);
+static void human_readable_size(char *buf, size_t size, size_t bytes);
+static void calculate_speed(char *buf, size_t size, size_t bytes, double elapsed);
 static void calculate_eta(char *buf, size_t size, double total_elapsed, int percentage);
 static double get_elapsed_time(struct timespec start, struct timespec end);
 static void render_progress_bar(int bars, int percentage, const char *sent_str,
                                 const char *total_str, const char *speed_str,
                                 const char *eta_str);
-static void print_progress(uint64_t sent, uint64_t total, int force_complete);
-static void update_progress_bar(uint64_t current, uint64_t total);
+static void print_progress(size_t sent, size_t total, int force_complete);
+static void update_progress_bar(size_t current, size_t total);
 
 void start_progress_bar(void)
 {
@@ -37,14 +37,14 @@ void start_progress_bar(void)
  * @param current Current number of bytes transferred
  * @param total   Total number of bytes to transfer
  */
-static void update_progress_bar(uint64_t current, uint64_t total)
+static void update_progress_bar(size_t current, size_t total)
 {
     if (current % UPDATE_INTERVAL < CHUNK_SIZE) {
         print_progress(current, total, current >= total);
     }
 }
 
-void stop_progress_bar(uint64_t total)
+void stop_progress_bar(size_t total)
 {
     double elapsed;
     struct timespec end_time;
@@ -76,7 +76,7 @@ void stop_progress_bar(uint64_t total)
  * @param size  Size of the buffer
  * @param bytes Number of bytes to format
  */
-static void human_readable_size(char *buf, size_t size, uint64_t bytes)
+static void human_readable_size(char *buf, size_t size, size_t bytes)
 {
     if (bytes >= SIZE_GB) {
         snprintf(buf, size, "%.2f GB", bytes / (double)SIZE_GB);
@@ -85,7 +85,7 @@ static void human_readable_size(char *buf, size_t size, uint64_t bytes)
     } else if (bytes >= SIZE_KB) {
         snprintf(buf, size, "%.2f KB", bytes / (double)SIZE_KB);
     } else {
-        snprintf(buf, size, "%" PRIu64 " bytes", bytes);
+        snprintf(buf, size, "%zd bytes", bytes);
     }
 }
 
@@ -100,10 +100,10 @@ static void human_readable_size(char *buf, size_t size, uint64_t bytes)
  * @param bytes   Number of bytes transferred
  * @param elapsed Time elapsed in seconds
  */
-static void calculate_speed(char *buf, size_t size, uint64_t bytes, double elapsed)
+static void calculate_speed(char *buf, size_t size, size_t bytes, double elapsed)
 {
     double speed = bytes / elapsed;
-    human_readable_size(buf, size, (uint64_t)speed);
+    human_readable_size(buf, size, (size_t)speed);
     strcat(buf, "/s");
 }
 
@@ -171,7 +171,7 @@ static void render_progress_bar(int bars, int percentage, const char *sent_str,
  * @param total          Total number of bytes to send
  * @param force_complete Flag to force display of completed progress (100%)
  */
-static void print_progress(uint64_t sent, uint64_t total, int force_complete)
+static void print_progress(size_t sent, size_t total, int force_complete)
 {
     struct timespec now = {0, 0};
     double elapsed, total_elapsed;

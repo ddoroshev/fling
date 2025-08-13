@@ -17,7 +17,7 @@ static void test_file_open__success(void)
     CHECK(rc >= 0, "Unexpected result code: %d", rc);
     rc = strcmp(f.hdr.fname, FILE_NAME_1M);
     CHECK(rc == 0, "Unexpected result code: %d", rc);
-    CHECK(f.hdr.fsize == 1024 * 1024, "Unexpected file size: %" PRIu64, f.hdr.fsize);
+    CHECK(f.hdr.fsize == 1024 * 1024, "Unexpected file size: %zd", f.hdr.fsize);
 
     close(f.fd);
 }
@@ -62,7 +62,7 @@ static void test_file_open__255(void)
     CHECK(rc >= 0, "Unexpected result code: %d", rc);
     rc = strcmp(f.hdr.fname, FILE_NAME_255);
     CHECK(rc == 0, "Unexpected result code: %d", rc);
-    CHECK(f.hdr.fsize == 0, "Unexpected file size: %" PRIu64, f.hdr.fsize);
+    CHECK(f.hdr.fsize == 0, "Unexpected file size: %zd", f.hdr.fsize);
 
     close(f.fd);
 }

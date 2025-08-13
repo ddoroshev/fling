@@ -40,7 +40,7 @@ static void _cleanup(void)
 /**
  * Perform a cleanup after failing assert()
  */
-static void handle_sigabrt(int signum)
+static void handle_sigabrt()
 {
     _cleanup();
     exit(1);

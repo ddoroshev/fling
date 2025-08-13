@@ -35,7 +35,7 @@
  * @param current Current number of bytes transferred
  * @param total Total number of bytes to transfer
  */
-typedef void (*progress_bar_func)(uint64_t current, uint64_t total);
+typedef void (*progress_bar_func)(size_t current, size_t total);
 
 /**
  * Global progress callback pointer
@@ -80,5 +80,5 @@ void start_progress_bar(void);
  *
  * @param total Total number of bytes transferred
  */
-void stop_progress_bar(uint64_t total);
+void stop_progress_bar(size_t total);
 

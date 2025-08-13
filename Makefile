@@ -1,6 +1,6 @@
 VERSION := $(shell git describe --tags --always --dirty)
 CC = gcc
-CFLAGS = -I. -Wall -std=gnu11 -fno-omit-frame-pointer -O3 -DFLING_VERSION=\"$(VERSION)\"
+CFLAGS = -I. -Wall -Wextra -Wsign-conversion -std=gnu11 -fno-omit-frame-pointer -O3 -DFLING_VERSION=\"$(VERSION)\"
 LDFLAGS =
 
 DEBUG_CFLAGS = -I. -Wall -std=gnu11 -fno-omit-frame-pointer -g

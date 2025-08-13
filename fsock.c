@@ -16,7 +16,7 @@ ssize_t ftosock(int fd, int sock, char *buf, size_t length)
         return -1;
     }
 
-    bytes_sent = send(sock, buf, bytes_read, 0);
+    bytes_sent = send(sock, buf, (size_t)bytes_read, 0);
     if (bytes_sent < 0) {
         perror("send");
         return -1;
@@ -34,7 +34,7 @@ ssize_t socktof(int sock, int fd, char *buf, size_t length)
         return -1;
     }
 
-    bytes_written = write(fd, buf, bytes_read);
+    bytes_written = write(fd, buf, (size_t)bytes_read);
     if (bytes_written < 1) {
         perror("write");
         return -1;

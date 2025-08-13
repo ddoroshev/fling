@@ -5,8 +5,8 @@
 #define MAX_FILE_NAME 255
 
 typedef struct {
-    char     fname[MAX_FILE_NAME + 1];
-    uint64_t fsize;
+    char   fname[MAX_FILE_NAME + 1];
+    size_t fsize;
 } file_header;
 
 typedef struct {
@@ -14,7 +14,7 @@ typedef struct {
     int fd;
 } file;
 
-#define FHEADER_SIZE sizeof(file_header)
+#define FHEADER_SIZE (size_t)sizeof(file_header)
 #define CHUNK_SIZE   1024*256
 
 /**
@@ -27,7 +27,7 @@ typedef struct {
  * received filename and writes the file contents to it. The function
  * handles the entire file receiving process, from header to content.
  */
-uint64_t receive_file(int sock);
+ssize_t receive_file(int sock);
 
 /**
  * Open a file and prepare its header for transfer
@@ -40,7 +40,7 @@ uint64_t receive_file(int sock);
  * @param fname Path to the file to be opened
  * @return 0 on success, -1 on error (e.g., file not found)
  */
-int  file_open  (file*, char*);
+int file_open  (file*, char*);
 
 /**
  * Close a file descriptor and reset the file structure
@@ -63,4 +63,4 @@ void file_close (file*);
  *
  * Return: Total bytes sent on success, -1 on error
  */
-uint64_t file_send(file*, int sock);
+ssize_t file_send(file*, int sock);

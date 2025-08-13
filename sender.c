@@ -21,10 +21,10 @@
  */
 int exec_sender(char *filename, const char *host, const char *port)
 {
-    int rc, sock;
+    int retval = 0, rc, sock;
     file f = {0};
 
-    uint64_t total_size;
+    ssize_t total_size;
 
     rc = file_open(&f, filename);
     if (rc < 0) {
@@ -38,15 +38,17 @@ int exec_sender(char *filename, const char *host, const char *port)
     }
 
     start_progress_bar();
-    /* Don't check the result, because we'll close
-     * the descriptors afterwards anyway */
-    total_size = file_send(&f, sock);
 
-    stop_progress_bar(total_size);
+    total_size = file_send(&f, sock);
+    if (total_size >= 0) {
+        stop_progress_bar((size_t)total_size);
+    } else {
+        retval = total_size;
+    }
 
     /* Cleanup */
     close(sock);
     file_close(&f);
 
-    return 0;
+    return retval;
 }

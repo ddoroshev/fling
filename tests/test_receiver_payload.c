@@ -51,7 +51,8 @@ static void test_file_size_mismatch__actual_size_is_larger_1(void)
 
     size_t header_size = 2,
            actual_size = 5;
-    int fd, len;
+    int fd;
+    ssize_t len;
     file_header hdr = {
         .fname = TEST_FNAME_SIZE_MISMATCH_1_1,
         .fsize = header_size,
@@ -65,7 +66,8 @@ static void test_file_size_mismatch__actual_size_is_larger_1(void)
     memset(ctx.buf, 0, actual_size);
     OPEN(fd, "tests/data/" TEST_FNAME_SIZE_MISMATCH_1_1, O_RDONLY);
     len = read(fd, ctx.buf, actual_size);
-    CHECK(len == header_size, "File size is incorrect (%d)", len);
+    CHECK(len >= 0, "Failed to read file");
+    CHECK((size_t)len == header_size, "File size is incorrect (%zd)", len);
     close(fd);
 
     TEARDOWN();
@@ -82,7 +84,8 @@ static void test_file_size_mismatch__actual_size_is_larger_2(void)
 
     size_t header_size = CHUNK_SIZE + 2,
            actual_size = CHUNK_SIZE + 5;
-    int fd, len;
+    int fd;
+    ssize_t len;
     file_header hdr = {
         .fname = TEST_FNAME_SIZE_MISMATCH_1_2,
         .fsize = header_size,
@@ -99,7 +102,8 @@ static void test_file_size_mismatch__actual_size_is_larger_2(void)
     memset(ctx.buf, 0, actual_size);
     OPEN(fd, "tests/data/" TEST_FNAME_SIZE_MISMATCH_1_2, O_RDONLY);
     len = read(fd, ctx.buf, actual_size);
-    CHECK(len == header_size, "File size is incorrect (%d)", len);
+    CHECK(len >= 0, "Failed to read file");
+    CHECK((size_t)len == header_size, "File size is incorrect (%zd)", len);
     close(fd);
 
     TEARDOWN();
@@ -115,7 +119,8 @@ static void test_file_size_mismatch__actual_size_is_smaller(void)
 
     size_t header_size = 3,
            actual_size = 5;
-    int fd, len;
+    int fd;
+    ssize_t len;
     file_header hdr = {
         .fname = TEST_FNAME_SIZE_MISMATCH_2,
         .fsize = actual_size,
@@ -132,7 +137,8 @@ static void test_file_size_mismatch__actual_size_is_smaller(void)
     memset(ctx.buf, 0, actual_size);
     OPEN(fd, "tests/data/" TEST_FNAME_SIZE_MISMATCH_2, O_RDONLY);
     len = read(fd, ctx.buf, actual_size);
-    CHECK(len == header_size, "File size is incorrect (%d)", len);
+    CHECK(len >= 0, "Failed to read file");
+    CHECK((size_t)len == header_size, "File size is incorrect (%zd)", len);
     close(fd);
 
     TEARDOWN();
