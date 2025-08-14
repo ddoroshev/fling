@@ -13,6 +13,7 @@
 #include "../file.h"
 
 #include "test.h"
+#include "test_file.h"
 #include "test_receiver_payload.h"
 
 /**
@@ -37,6 +38,32 @@ static void test_path_traversal_payload(void)
 
     CHECK(!is_file_outside, "File was found outside the test dir");
     CHECK(is_file_inside, "File was found inside the test dir");
+
+    TEARDOWN();
+}
+
+/**
+ * Send a malformed payload with long file name, without null-termination
+ * and a content
+ */
+static void test_file_name_without_null_termination(void)
+{
+    SETUP();
+    file_header hdr = {
+        .fname = FILE_NAME_255,
+        .fsize = 18446744073709551615UL,
+    };
+    hdr.fname[255] = 'b';
+    char payload[1] = {'c'};
+    int is_file_created = 0;
+
+    SEND(ctx.sock, &hdr, FHEADER_SIZE);
+    puts("EHSI");
+    SEND(ctx.sock, payload, 1);
+    WAITABIT();
+
+    is_file_created = access("tests/data/" FILE_NAME_255, F_OK) == 0;
+    CHECK(is_file_created, "File wasn't created");
 
     TEARDOWN();
 }
@@ -154,4 +181,5 @@ void run_receiver_payload_tests(void)
     test_file_size_mismatch__actual_size_is_larger_1();
     test_file_size_mismatch__actual_size_is_larger_2();
     test_file_size_mismatch__actual_size_is_smaller();
+    test_file_name_without_null_termination();
 }

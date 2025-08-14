@@ -135,13 +135,22 @@ ssize_t receive_file(int sock)
 {
     ssize_t bytes_read, rc, retval;
     file f = {0};
+    char clean_name[MAX_FILE_NAME + 1];
+    const char *base;
 
     bytes_read = recv(sock, &f, FHEADER_SIZE, 0);
     if (bytes_read <= 0 || (size_t)bytes_read < FHEADER_SIZE) {
         printf("Unexpected amount of bytes: %zd\n", bytes_read);
         return -1;
     }
-    strncpy(f.hdr.fname, basename(f.hdr.fname), strlen(f.hdr.fname));
+    f.hdr.fname[MAX_FILE_NAME] = '\0';
+
+    base = basename(f.hdr.fname);
+    strncpy(clean_name, base, MAX_FILE_NAME);
+    clean_name[MAX_FILE_NAME] = '\0';
+
+    strncpy(f.hdr.fname, clean_name, MAX_FILE_NAME);
+
     printf("Accepting file: name %s, size %zd...\n",
            f.hdr.fname, f.hdr.fsize);
 
@@ -164,4 +173,3 @@ fclose:
 ret:
     return retval;
 }
-
