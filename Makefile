@@ -1,4 +1,4 @@
-VERSION := $(shell git describe --tags --always --dirty)
+VERSION := $(shell ./get_version.sh)
 CC = gcc
 CFLAGS = -I. -Wall -Wextra -Wsign-conversion -std=gnu11 -fno-omit-frame-pointer -O3 -DFLING_VERSION=\"$(VERSION)\"
 LDFLAGS =
@@ -89,7 +89,7 @@ test-data: test-data-slow
 check:
 	cppcheck --enable=all --suppress=missingIncludeSystem .
 
-clean: clean-objs clean-bins
+clean: clean-objs clean-bins clean-docs
 
 clean-objs:
 	rm -f $(OBJ_FLING) $(OBJ_TEST) $(DEPS) $(DEPS:=.*)
@@ -100,9 +100,15 @@ clean-bins:
 clean-debug:
 	rm -f $(FLING_DEBUG)
 
+clean-docs:
+	rm -rf docs
+
 playground:
 	$(CC) -o bin/playground playground.c
 	bin/playground
+
+docs:
+	PROJECT_NUMBER=$(VERSION) doxygen
 
 info:
 	@echo "Source files (common): $(SRC_COMMON)"
